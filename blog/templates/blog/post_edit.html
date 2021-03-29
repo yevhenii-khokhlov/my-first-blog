@@ -4,8 +4,6 @@
     <h1>New post</h1>
     <form method="POST" class="post-form">{% csrf_token %}
         {{ form.as_p }}
-        {% if user.is_authenticated %}
-             <a class="btn btn-default" href="{% url 'post_edit' pk=post.pk %}"><span class="glyphicon glyphicon-pencil"></span></a>
-        {% endif %}
+        <button type="submit" class="save btn btn-default">Save</button>
     </form>
 {% endblock %}
