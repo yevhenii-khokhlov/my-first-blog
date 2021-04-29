@@ -2,16 +2,18 @@
 
 {% block content %}
     {% for post in posts %}
-        <div class="content">
-            <hr style="height:3px; background-color: black;">
-            <div class="date">
-                {{ post.published_date }}
-            </div>
-            <h1><a href="{% url 'post-detail' pk=post.pk %}">{{ post.title }}</a></h1>
-            <p>{{ post.text|linebreaksbr }}</p>
-            <p>Comments: {{ post.comments.all.count }}</p>
-            <h4 align="right"><a href="{% url 'comment-new' post_id=post.pk %}">Add comment</a></h4>
-        </div>
-    {% endfor %}
+    <div class="card" style="margin-top: 15px">
+        <h5 class="card-header">{{ post.title }}</h5>
 
+        <div class="card-body">
+            <p class="card-text" >{{ post.text|linebreaksbr }}</p>
+            <p class="text-muted">Comments: {{ post.comments.all.count }}</p>
+
+            <a href="{% url "post-detail" pk=post.pk %}" class="btn btn-outline-dark">Detail</a>
+            <a href="{% url "comment-new" post_id=post.pk %}" class="btn btn-dark">Leave comment</a>
+
+            <p class="fs-6" style="text-align: right">{{ post.published_date }}</p>
+        </div>
+    </div>
+    {% endfor %}
 {% endblock %}

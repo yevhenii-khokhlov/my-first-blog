@@ -1,14 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
-from django.urls import reverse_lazy
 from django.views import generic
 from django.http import HttpResponseRedirect
-from django.views.generic.edit import FormView, CreateView
-from django import urls
-
+from django.views.generic.edit import CreateView
+from django.db.models import Prefetch
 
 from .models import Post, Comment
-from .forms import PostForm, CommentForm
+from .forms import PostForm
 
 
 class PostList(generic.TemplateView):
@@ -16,7 +14,7 @@ class PostList(generic.TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["posts"] = Post.objects.all().prefetch_related("comments")
+        context["posts"] = Post.objects.all().prefetch_related("comments").order_by('-created_date')
         return context
 
 
@@ -27,7 +25,8 @@ class PostDetailView(generic.DetailView):
 
     def get_queryset(self, **kwargs):
         post_id = self.kwargs['pk']
-        queryset = Post.objects.filter(id=post_id).prefetch_related("comments")
+        queryset = Post.objects.filter(id=post_id)\
+            .prefetch_related(Prefetch("comments", queryset=Comment.objects.order_by('-created_date')))
         return queryset
 
 
@@ -64,7 +63,6 @@ class CommentNewView(CreateView):
     model = Comment
     template_name = 'blog/new_comment.html'
     fields = ['text', 'created_by']
-    # success_url = reverse_lazy(PostList)
 
     def form_valid(self, form, **kwargs):
         comment = form.save(commit=False)
