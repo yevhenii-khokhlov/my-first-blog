@@ -11,4 +11,5 @@ urlpatterns = [
     path('post/new/', views.post_new, name='post-new'),
     path('post/<int:pk>/edit/', views.post_edit, name='post-edit'),
     path('post/<int:post_id>/comment/new/', views.CommentNewView.as_view(), name='comment-new'),
+    path('about/', views.about, name='about'),
 ]

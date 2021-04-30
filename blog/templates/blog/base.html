@@ -21,17 +21,36 @@
 
                 <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
                     <li><a href="{% url 'post-list' %}" class="nav-link px-2 text-white">Home Page</a></li>
-                    <li><a href="#" class="nav-link px-2 text-white">Contacts</a></li>
-                    <li><a href="#" class="nav-link px-2 text-white">FAQs</a></li>
-                    <li><a href="#" class="nav-link px-2 text-white">About</a></li>
+
+                    <li class="nav-item dropdown">
+                          <a class="nav-link dropdown-toggle text-white" href="#"
+                             id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                             aria-expanded="false">Contacts</a>
+
+                              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <li><a class="dropdown-item" href="https://github.com/yevhenii-khokhlov">
+                                        Go to my GitHub</a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="https://www.linkedin.com/in/yevhenii-khokhlov-0447bb201/">
+                                        Go to my LinkedIn</a>
+                                    </li>
+                              </ul>
+                    </li>
+
+                    <li><a href="{% url 'about' %}" class="nav-link px-2 text-white">About</a></li>
                 {% if user.is_authenticated %}
                     <li><a href="{% url 'post-new' %}" class="nav-link px-2 text-white">New Post</a></li>
                 {% endif %}
                 </ul>
 
                 <div class="text-end">
-                    <button type="button" class="btn btn-outline-light me-2">Login</button>
-                    <button type="button" class="btn btn-warning">Sign-up</button>
+                    {% if user.is_authenticated %}
+                        <button type="button" class="btn btn-outline-light me-2">Logout</button>
+                    {% else %}
+                        <button type="button" class="btn btn-outline-light me-2">Login</button>
+                        <button type="button" class="btn btn-warning">Sign-up</button>
+                    {% endif %}
                 </div>
             </div>
         </div>

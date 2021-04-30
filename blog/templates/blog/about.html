@@ -1,0 +1,23 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+    <div class="card" style="margin-top: 15px">
+        <h5 class="card-header">About this project</h5>
+
+        <div class="card-body">
+            <p class="card-text" >
+                This is my little pet project. It is made on Python 3.
+                I used the Django framework and Bootstrap 5.
+                Version control and deployment through the GitHub repository.
+            </p>
+            <p class="card-text" >
+                Цей мій невеликий пет-проект. Він зроблений на Python.
+                Я використовував Django фреймворк та Bootstrap 5.
+                Контроль версій та розгортання проводив через за допомогою GitHub.
+            </p>
+            <p class="text-muted">2021, Kyiv</p>
+
+            <a href="{% url "post-list" %}" class="btn btn-outline-dark">OK</a>
+        </div>
+    </div>
+{% endblock %}

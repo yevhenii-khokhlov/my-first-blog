@@ -71,3 +71,7 @@ class CommentNewView(CreateView):
         comment.post_id = post_id
         comment.save()
         return HttpResponseRedirect('/')
+
+
+def about(request):
+    return render(request, 'blog/about.html', {})
