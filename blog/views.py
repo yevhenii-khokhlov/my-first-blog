@@ -5,30 +5,47 @@ from django.views import generic
 from django.http import HttpResponseRedirect
 from django.views.generic.edit import CreateView
 from django.db.models import Prefetch
+from django.contrib.auth import login, logout, authenticate
+from django.contrib import messages
+from django.contrib.auth.forms import AuthenticationForm
 
 from .models import Post, Comment
-from .forms import PostForm
+from .forms import PostForm, SignUpUserForm
 
 
-class PostList(generic.TemplateView):
-    template_name = "blog/post_list.html"
+# TODO: дебажити логін та регістрацію
+def register_request(request):
+    if request.method == "POST":
+        form = SignUpUserForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect("post-list")
+        messages.error(request, "Unsuccessful registration. Invalid information.")
+    form = SignUpUserForm
+    return render(request=request, template_name="blog/sign_up.html", context={"register_form": form})
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["posts"] = Post.objects.all().prefetch_related("comments").order_by('-created_date')
-        return context
+
+def login_request(request):
+    if request.method == "POST":
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect("post-list")
+            messages.error(request, "Invalid username or password.")
+        messages.error(request, "Invalid username or password.")
+    form = AuthenticationForm()
+    return render(request=request, template_name="blog/login.html", context={"login_form": form})
 
 
-class PostDetailView(generic.DetailView):
-    model = Post
-    template_name = "blog/post_detail.html"
-    context_object_name = "post"
-
-    def get_queryset(self, **kwargs):
-        post_id = self.kwargs['pk']
-        queryset = Post.objects.filter(id=post_id)\
-            .prefetch_related(Prefetch("comments", queryset=Comment.objects.order_by('-created_date')))
-        return queryset
+@login_required()
+def logout_request(request):
+    logout(request)
+    return redirect("post-list")
 
 
 @login_required()
@@ -62,6 +79,31 @@ def post_edit(request, pk):
     return render(request, 'blog/post_edit.html', {'form': form})
 
 
+def about(request):
+    return render(request, 'blog/about.html', {})
+
+
+class PostList(generic.TemplateView):
+    template_name = "blog/post_list.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["posts"] = Post.objects.all().prefetch_related("comments").order_by('-created_date')
+        return context
+
+
+class PostDetailView(generic.DetailView):
+    model = Post
+    template_name = "blog/post_detail.html"
+    context_object_name = "post"
+
+    def get_queryset(self, **kwargs):
+        post_id = self.kwargs['pk']
+        queryset = Post.objects.filter(id=post_id) \
+            .prefetch_related(Prefetch("comments", queryset=Comment.objects.order_by('-created_date')))
+        return queryset
+
+
 class CommentNewView(CreateView):
     model = Comment
     template_name = 'blog/new_comment.html'
@@ -74,7 +116,4 @@ class CommentNewView(CreateView):
         comment.post_id = post_id
         comment.save()
         return HttpResponseRedirect('/')
-
-
-def about(request):
-    return render(request, 'blog/about.html', {})
+    # TODO: комментарі доступні лише зареєстрованим користувачам
