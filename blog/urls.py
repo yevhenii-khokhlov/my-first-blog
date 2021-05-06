@@ -12,7 +12,7 @@ urlpatterns = [
     path('post/<int:pk>/edit/', views.post_edit, name='post-edit'),
     path('post/<int:post_id>/comment/new/', views.CommentNewView.as_view(), name='comment-new'),
     path('about/', views.about, name='about'),
-    path("register/", views.register_request, name="register"),
+    path("register/", views.sign_up_request, name="register"),
     path("login/", views.login_request, name="login"),
     path("logout/", views.logout_request, name="logout"),
 ]

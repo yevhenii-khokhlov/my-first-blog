@@ -8,13 +8,13 @@ from django.db.models import Prefetch
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import Post, Comment
 from .forms import PostForm, SignUpUserForm
 
 
-# TODO: дебажити логін та регістрацію
-def register_request(request):
+def sign_up_request(request):
     if request.method == "POST":
         form = SignUpUserForm(request.POST)
         if form.is_valid():
@@ -104,16 +104,18 @@ class PostDetailView(generic.DetailView):
         return queryset
 
 
-class CommentNewView(CreateView):
+class CommentNewView(LoginRequiredMixin, CreateView):
+    login_url = 'login'
+    redirect_field_name = 'login'
     model = Comment
     template_name = 'blog/new_comment.html'
-    fields = ['text', 'created_by']
+    fields = ['text']
 
     def form_valid(self, form, **kwargs):
         comment = form.save(commit=False)
         post_id = self.kwargs['post_id']
         comment.published_date = timezone.now()
         comment.post_id = post_id
+        comment.created_by = self.request.user.username
         comment.save()
         return HttpResponseRedirect('/')
-    # TODO: комментарі доступні лише зареєстрованим користувачам
